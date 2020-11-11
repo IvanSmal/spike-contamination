@@ -1,4 +1,4 @@
-function [sptr,c_sptr,raw_sig, filt_sig]=fakesignals(trials,avgfr,burstL,fakeWF)
+function [spt,c_spt,raw_sig, filt_sig]=fakesignals(trials,avgfr,burstL,fakeWF)
 %% create fake spike times based on trials and max fr
 epspf=epspKernel; % set the kernel for spike smoothing using a function
 
@@ -19,13 +19,13 @@ for tr=1:trials
     shifttp=(-min(fts(tr,:)))+1;
     fts(tr,:)=fts(tr,:)+shifttp+50; %%set first spike to be exactly at the start of the burst
     %% turn spiketimes into binary spike trains
-    sptr(tr,1:50)=0;
-    sptr(tr,fts(tr,:))=1;
-    sptr(tr,end+1:200)=0;
+    spt(tr,1:50)=0;
+    spt(tr,fts(tr,:))=1;
+    spt(tr,end+1:200)=0;
     
     %% convert binary spike trains to convolved ones
-    temp=conv(sptr(tr,:),epspf);
-    c_sptr(tr,:)=temp(100:end-100);
+    temp=conv(spt(tr,:),epspf);
+    c_spt(tr,:)=temp(100:end-100);
     clear temp
     
     %% turn spiketimes into 30K Hz sampled waveforms
