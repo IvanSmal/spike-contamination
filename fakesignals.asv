@@ -1,0 +1,68 @@
+function [sptr,c_sptr,raw_sig, filt_sig]=fakesignals(trials,avgfr,burstL,fakeWF)
+%% create fake spike times based on trials and max fr
+epspf=epspKernel; % set the kernel for spike smoothing using a function
+lpf=lowpassfilt; % set your filter using a function
+
+fts=nan(trials,ceil(avgfr/50));
+for tr=1:trials
+    ms=1;
+    while ms<=ceil(avgfr/(1000/burstL)) %figure out spikes/burst length
+        tempts=ceil(normrnd(10,5)); %get a random spike time
+        if any(fts(tr,:)==tempts)
+            continue
+        else
+            fts(tr,ms)=tempts+51;
+            ms=ms+1;
+        end
+    end
+    
+    %% turn spiketimes into binary spike trains
+    sptr(tr,1:50)=0;
+    sptr(tr,fts(tr,:))=1;
+    sptr(tr,end+1:200)=0;
+    
+    %% convert binary spike trains to convolved ones
+    temp=conv(sptr(tr,:),epspf);
+    c_sptr(tr,:)=temp(100:end-100);
+    clear temp
+    
+    %% turn spiketimes into 30K Hz sampled waveforms
+    for s=1:size(fts(tr,:),2)
+        wf=fakeWF(randi(size(fakeWF,1)),:); %pull random waveform
+        sp=fts(tr,s)*30; %get start point in 30k hz sampled
+        ep=sp+length(wf)-1; %get end point for waveform
+        raw_sig(tr, sp:ep)=wf;
+    end
+    raw_sig(tr, end+1:6000)=0;
+    %% turn 30KHz signal to low-passed down-sampled signal (spike contamination signal)
+    filt_sig(tr,:)=filtfilt(lpf,temp);
+end
+end
+
+function epspf=epspKernel
+Tg=1; %growth
+Td=20; %decay
+clear epspf
+timeint=-100:104;
+for m= 1:length(timeint)
+    if timeint(m)<0
+        epspf(m)=0;
+    else
+        epspf(m)=((1-exp((-timeint(m))./1))).*exp((-timeint(m))./Td);
+    end
+end
+epspf=[epspf(5:end)];
+end
+
+function out=lowpassfilt
+fc = 30; %lp frequency
+fs = 1000; %sample frequency
+
+out = designfilt('lowpassiir','StopbandAttenuation', 60, ...
+    'PassbandFrequency',fc,...
+    'StopbandFrequency',fc+5,...
+    'PassbandRipple',0.01, ...
+    'SampleRate',fs,...
+    'DesignMethod', 'butter');
+
+end
