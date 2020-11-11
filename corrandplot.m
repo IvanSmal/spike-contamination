@@ -10,6 +10,13 @@ function corrmat=corrandplot(sp,lfp)
     end
     figure(1);
     imagesc(corrmat)
+    xticks([0:25:200])
+    xticklabels([-50:25:150])
+    yticks([0:10:100])
+    yticklabels([-50:10:50])
+    hold on;
+    plot([0 200],[50 50],'w')
+    plot([50 50],[0 100],'w')
     figure(2);
     plot(sp')
     figure(3);
