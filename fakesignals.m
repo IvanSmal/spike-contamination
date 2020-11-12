@@ -8,7 +8,8 @@ fts=nan(trials,ceil(avgfr/50));
 for tr=1:trials
     ms=1;
     while ms<=ceil(avgfr/(1000/burstL)) %figure out spikes/burst length
-        tempts=ceil(normrnd(burstL/2,burstL/6)); %get a random spike time
+        tempts=ceil(normrnd(ceil(burstL/2),...
+            ceil(burstL/6))); %get a random spike time
         if any(fts(tr,:)==tempts)
             continue
         else
@@ -61,6 +62,6 @@ end
 
 function out=lowpassfilt
 
-out = designfilt('lowpassfir', 'FilterOrder', 20, 'CutoffFrequency', (30/30000)); 
+out = designfilt('lowpassfir', 'FilterOrder', 20, 'CutoffFrequency', (100/30000)); 
 
 end
