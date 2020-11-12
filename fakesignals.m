@@ -21,7 +21,7 @@ for tr=1:trials
     %% turn spiketimes into binary spike trains
     spt(tr,1:50)=0;
     spt(tr,fts(tr,:))=1;
-    spt(tr,end+1:200)=0;
+    spt(tr,end+1:201)=0;
     
     %% convert binary spike trains to convolved ones
     temp=conv(spt(tr,:),epspf);
