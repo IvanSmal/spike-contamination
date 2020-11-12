@@ -8,7 +8,7 @@ fts=nan(trials,ceil(avgfr/50));
 for tr=1:trials
     ms=1;
     while ms<=ceil(avgfr/(1000/burstL)) %figure out spikes/burst length
-        tempts=ceil(normrnd(10,5)); %get a random spike time
+        tempts=ceil(normrnd(burstL/2,burstL/6)); %get a random spike time
         if any(fts(tr,:)==tempts)
             continue
         else
@@ -21,7 +21,7 @@ for tr=1:trials
     %% turn spiketimes into binary spike trains
     spt(tr,1:50)=0;
     spt(tr,fts(tr,:))=1;
-    spt(tr,end+1:201)=0;
+    spt(tr,end+1:500)=0;
     
     %% convert binary spike trains to convolved ones
     temp=conv(spt(tr,:),epspf);
@@ -35,7 +35,7 @@ for tr=1:trials
         ep=sp+length(wf)-1; %get end point for waveform
         raw_sig(tr, sp:ep)=wf;
     end
-    raw_sig(tr, end+1:6000)=0;
+    raw_sig(tr, end+1:15000)=0;
     %% turn 30KHz signal to low-passed down-sampled signal (spike contamination signal)
     temp=filtfilt(lpf, raw_sig(tr, :));
     filt_sig.ds(tr,:)=downsample(temp,30); %downsampled to 1000hz
